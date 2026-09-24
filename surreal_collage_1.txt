@@ -8,3 +8,12 @@ negative_prompt = (
    " blurry, lowres, watermark, text, deformed faces, extra limbs, "
    "bad anatomy, extra fingers, cartoon, illustration, oversaturated"
 ) # This is what the model steers away from.
+
+image = pipe(
+    prompt,
+    negative_prompt=negative_prompt,
+    generator=torch.Generator(device).manual_seed(11001), # change the seed!
+    num_inference_steps=1, guidance_scale=0.0
+).images[0]
+
+image
