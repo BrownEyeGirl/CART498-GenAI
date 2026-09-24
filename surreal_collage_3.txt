@@ -1,0 +1,9 @@
+prompt = (
+   "gimp sitting on a bank (important), holding a bat"
+   "atmosphere: b&w, no occlusion harsh light from left top corner, high contrast sun flares, rainbow, "
+)
+
+negative_prompt = (
+   " blurry, lowres, watermark, text, deformed faces, extra limbs, "
+   "bad anatomy, extra fingers, cartoon, illustration, oversaturated"
+) # This is what the model steers away from.
