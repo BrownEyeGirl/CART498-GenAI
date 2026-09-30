@@ -1,3 +1,5 @@
+# Assignment 2 <br>
+## P+7 (Oulipian language modelling) <br>
 ## Background <br>
 The Oulipo (Ouvroir de Littérature Potentielle, or “Workshop of Potential Literature”) is a French literary group founded in 1960 by writer Raymond Queneau and mathematician François Le Lionnais. The group focuses on using rules and constraints in writing as a way to spark creativity. Rather than seeing constraints as obstacles, Oulipians treat them as tools to inspire new forms of storytelling and poetry. Their work combines mathematics, language, and playfulness, making their approach both unique and influential in modern literature.
 
