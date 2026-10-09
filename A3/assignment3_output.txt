@@ -1,1 +1,118 @@
+## TEST 1
+
+Enter a base number for n: -0.45
+Enter how many iterations i: 10
+
+--- Iteration 1 (solver temp=0.20) ---
+-0.45*-0.45*1: model said '0', expected 0.2025 -> ✘
+Oh no, I really messed that up! I apparently treated multiplication like a mind-
+reader and guessed zero instead of doing the actual math—typical brain fog
+moment!
+
+--- Iteration 2 (solver temp=0.50) ---
+-0.45*-0.45*2: model said '1', expected 0.405 -> ✘
+Oops, I really squared that one up wrong—looks like my math skills took a little
+nap!
+
+--- Iteration 3 (solver temp=0.80) ---
+-0.45*-0.45*3: model said '1', expected 0.6075 -> ✘
+Looks like my math skills took a wrong turn at multiplication—I really need to
+stop squaring negatives like a clumsy squirrel!
+
+--- Iteration 4 (solver temp=1.10) ---
+-0.45*-0.45*4: model said '1', expected 0.81 -> ✘
+Oops, I totally messed that one up – apparently, I can't even multiply decimals
+without tripping over myself!
+
+--- Iteration 5 (solver temp=1.40) ---
+-0.45*-0.45*5: model said '1', expected 1.0125000000000002 -> ✘
+Oh wow, I really danced around that decimal like it was a bomb—math clearly
+isn't my jam!
+
+--- Iteration 6 (solver temp=1.70) ---
+-0.45*-0.45*6: model said '1', expected 1.215 -> ✘
+Well, looks like I stumbled over the decimals—I'm really out here making math
+look harder than it is!
+
+--- Iteration 7 (solver temp=2.00) ---
+-0.45*-0.45*7: model said '2', expected 1.4175 -> ✘
+Oops, I really messed that one up—multiplying decimals is clearly not my strong
+suit!
+
+--- Iteration 8 (solver temp=2.00) ---
+-0.45*-0.45*8: model said '2', expected 1.62 -> ✘
+Oops, I really slipped on that one—apparently multiplying negatives and decimals
+isn't my forte!
+
+--- Iteration 9 (solver temp=2.00) ---
+-0.45*-0.45*9: model said '2', expected 1.8225000000000002 -> ✘
+Oops, I really slipped on that multiplication—guess I’m better at making
+mistakes than math!
+
+--- Iteration 10 (solver temp=2.00) ---
+-0.45*-0.45*10: model said '2', expected 2.0250000000000004 -> ✘
+Oh no, I was way off this time! Seems like my calculator needs a pedicure to
+trim those tiny decimals—I definitely stepped on my own math toes.
+
+=========== SUMMARY ===========
+Correct: 0/10
+Errors:  10/10
+Final solver temperature: 2.00
+Colab paid products
+-
+Cancel contracts here
+
+## TEST 2
+Enter a base number for n: -23453
+Enter how many iterations i: 3
+
+--- Iteration 1 (solver temp=0.20) ---
+-23453.0*-23453.0*1: model said '550,052,580,609', expected 550043209.0 -> ✘
+Oops, I really messed that up—looks like I turned a math problem into a number
+explosion! I need to pay way more attention to those zeros.
+
+--- Iteration 2 (solver temp=0.50) ---
+-23453.0*-23453.0*2: model said '1105635838', expected 1100086418.0 -> ✘
+Oh no, I must have slipped on a banana peel in my calculations—clearly, my math
+skills need a serious tune-up!
+
+--- Iteration 3 (solver temp=0.80) ---
+-23453.0*-23453.0*3: model said '1651077167', expected 1650129627.0 -> ✘
+Well, I completely botched that one—guess my math skills took a nosedive off a
+cliff! Let me try to fix it quickly.  Let's compute:  -23453.0 * -23453.0 =
+(23453)^2  Calculate 23453 squared:  23453 * 23453  Let's compute step by step:
+23453 * 23453  Calculate approximate:
+
+=========== SUMMARY ===========
+Correct: 0/3
+Errors:  3/3
+Final solver temperature: 1.10
+
+## TEST 3
+Enter a base number for n: 1.5364
+Enter how many iterations i: 4
+
+--- Iteration 1 (solver temp=0.20) ---
+1.5364*1.5364*1: model said '2', expected 2.36052496 -> ✘
+Oops, I really shouldn't be trusted with basic multiplication—my brain clearly
+took a coffee break!
+
+--- Iteration 2 (solver temp=0.50) ---
+1.5364*1.5364*2: model said '4', expected 4.72104992 -> ✘
+Ah, I really messed that one up—turns out I'm better at guessing than actually
+multiplying. Let me try again more carefully.
+
+--- Iteration 3 (solver temp=0.80) ---
+1.5364*1.5364*3: model said '7', expected 7.08157488 -> ✘
+Whoops, I really mangled that one—my math skills are about as sharp as a marble!
+
+--- Iteration 4 (solver temp=1.10) ---
+1.5364*1.5364*4: model said '9', expected 9.44209984 -> ✘
+Oops, I really mangled that one—guess my math needs a serious reboot!
+
+=========== SUMMARY ===========
+Correct: 0/4
+Errors:  4/4
+Final solver temperature: 1.40
+
 
