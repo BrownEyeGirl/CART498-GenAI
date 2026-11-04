@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLLAMA — CART 498</title>
+
+<!-- Fonts: display / body / mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ===================== TOKENS ===================== */
+:root{
+  --ink:#0a0a0a;
+  --paper:#ffffff;
+  --grey:#777;
+  --line:#e6e6e6;
+  --mono:'IBM Plex Mono', monospace;
+  --display:'Archivo', sans-serif;
+  --body:'Inter', sans-serif;
+  --pad: clamp(20px, 6vw, 90px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  font-weight:400;
+  overflow-x:hidden;
+}
+::selection{background:var(--ink);color:var(--paper)}
+
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+
+/* ===================== SCANLINE TEXTURE (slide edge effect) ===================== */
+.scanlines{
+  position:fixed;
+  top:0;right:0;
+  width:14vw;height:100vh;
+  pointer-events:none;
+  z-index:1;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.05) 0px,
+    rgba(0,0,0,0.05) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+  -webkit-mask-image:linear-gradient(to left, black, transparent);
+          mask-image:linear-gradient(to left, black, transparent);
+}
+.scanlines.bottom{
+  top:auto;left:0;right:auto;bottom:0;
+  width:100vw;height:12vh;
+  -webkit-mask-image:linear-gradient(to top, black, transparent);
+          mask-image:linear-gradient(to top, black, transparent);
+  opacity:.35;
+}
+
+/* ===================== TOP BAR ===================== */
+.topbar{
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px var(--pad);
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(8px);
+  z-index:50;
+  border-bottom:1px solid var(--line);
+}
+.topbar nav{display:flex;gap:26px}
+.topbar nav a{position:relative}
+.topbar nav a::after{
+  content:"";position:absolute;left:0;bottom:-4px;
+  width:0;height:1px;background:var(--ink);
+  transition:width .25s ease;
+}
+.topbar nav a:hover::after{width:100%}
+
+/* ===================== HERO ===================== */
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:120px var(--pad) 60px;
+  position:relative;
+}
+.hero h1{
+  font-family:var(--display);
+  font-stretch:72%;
+  font-weight:800;
+  font-size:clamp(90px, 21vw, 340px);
+  line-height:.85;
+  letter-spacing:-.01em;
+  text-transform:uppercase;
+}
+.hero .sub{
+  margin-top:34px;
+  max-width:520px;
+  font-size:15px;
+  line-height:1.7;
+  color:#333;
+}
+.hero .byline{
+  position:absolute;
+  bottom:48px;left:var(--pad);
+  font-size:18px;
+  color:#444;
+}
+.hero .byline .label{
+  display:block;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink);
+  font-weight:500;
+  margin-bottom:6px;
+}
+.hero-meta{
+  position:absolute;
+  top:96px;right:var(--pad);
+  text-align:right;
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#555;
+  line-height:2;
+}
+.scroll-hint{
+  position:absolute;
+  bottom:48px;right:var(--pad);
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  writing-mode:vertical-rl;
+}
+
+/* ===================== TICKER ===================== */
+.ticker{
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+  overflow:hidden;
+  white-space:nowrap;
+  padding:14px 0;
+}
+.ticker-track{
+  display:inline-block;
+  animation:tick 22s linear infinite;
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ===================== SECTIONS ===================== */
+section{
+  padding:110px var(--pad);
+  border-bottom:1px solid var(--line);
+  position:relative;
+}
+.sec-label{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--grey);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:18px;
+}
+.sec-label::after{
+  content:"";flex:1;height:1px;background:var(--line);
+}
+.sec-title{
+  font-family:var(--display);
+  font-stretch:75%;
+  font-weight:800;
+  text-transform:uppercase;
+  font-size:clamp(44px, 7vw, 96px);
+  line-height:.92;
+  letter-spacing:-.01em;
+  margin-bottom:48px;
+}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:60px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ink);border:1px solid var(--ink)}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+.block h3{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.block h3::before{content:"●";font-size:8px}
+.block p, .block li{font-size:15px;line-height:1.75;color:#333}
+.block ul{list-style:none;margin:0}
+.block li{
+  padding-left:22px;position:relative;margin-bottom:10px;
+}
+.block li::before{
+  content:"—";position:absolute;left:0;color:var(--ink);
+}
+.lead{
+  font-size:clamp(19px,2.2vw,26px);
+  line-height:1.5;
+  font-weight:300;
+  margin-bottom:48px;
+  max-width:840px;
+}
+.lead strong{font-weight:600}
+
+/* ===================== CHIPS / PROS ===================== */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.chip{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  border:1px solid var(--ink);
+  padding:10px 18px;
+  border-radius:100px;
+  transition:.2s;
+  cursor:default;
+}
+.chip:hover{background:var(--ink);color:var(--paper)}
+
+/* ===================== COMMAND BLOCK ===================== */
+.cmd{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--mono);
+  padding:34px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+  margin:36px 0;
+}
+.cmd .prompt{color:#888;margin-right:8px;user-select:none}
+.cmd code{font-size:clamp(13px,1.6vw,18px);word-break:break-all}
+.copy-btn{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  background:transparent;
+  color:var(--paper);
+  border:1px solid var(--paper);
+  padding:12px 22px;
+  cursor:pointer;
+  transition:.2s;
+  white-space:nowrap;
+}
+.copy-btn:hover{background:var(--paper);color:var(--ink)}
+
+.ext-link{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  border-bottom:1px solid var(--ink);
+  padding-bottom:2px;
+}
+
+/* ===================== TIER CARDS ===================== */
+.tier{
+  background:var(--paper);
+  padding:36px 30px;
+  display:flex;
+  flex-direction:column;
+  min-height:420px;
+}
+.tier .t-name{
+  font-family:var(--display);
+  font-stretch:75%;
+  font-weight:800;
+  font-size:34px;
+  text-transform:uppercase;
+}
+.tier .t-price{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.1em;
+  margin:6px 0 26px;
+  color:#555;
+}
+.tier ul{list-style:none;flex:1}
+.tier li{
+  font-size:14px;line-height:1.6;
+  padding:9px 0 9px 22px;
+  border-top:1px solid var(--line);
+  position:relative;
+}
+.tier li::before{content:"+";position:absolute;left:0;font-family:var(--mono)}
+.tier.featured{background:var(--ink);color:var(--paper)}
+.tier.featured .t-price{color:#999}
+.tier.featured li{border-top-color:#2a2a2a}
+
+/* ===================== DIAGRAM (Architecture) ===================== */
+.diagram{
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto 1fr;
+  align-items:stretch;
+  gap:0;
+  margin:46px 0;
+  font-family:var(--mono);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+}
+@media(max-width:900px){
+  .diagram{grid-template-columns:1fr}
+  .diagram .arrow{transform:rotate(90deg);padding:18px 0}
+}
+.dbox{
+  border:1px solid var(--ink);
+  padding:28px 22px;
+  font-size:12px;
+  line-height:2;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.dbox b{font-size:14px}
+.dbox.dark{background:var(--ink);color:var(--paper)}
+.dbox .opt{border-top:1px dashed currentColor;padding-top:8px;margin-top:8px;opacity:.85}
+.arrow{
+  align-self:center;
+  padding:0 20px;
+  font-size:22px;
+}
+.diagram-caption{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--grey);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+/* ===================== ESTIMATOR ===================== */
+.estimator{
+  border:1px solid var(--ink);
+  padding:40px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:50px;
+  margin-top:44px;
+}
+@media(max-width:900px){.estimator{grid-template-columns:1fr}}
+.est label{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  display:flex;justify-content:space-between;
+  margin-bottom:10px;
+}
+.est label span{color:var(--grey)}
+.est field{margin-bottom:32px}
+.est input[type=range]{width:100%;accent-color:var(--ink);height:28px}
+.est select{
+  width:100%;
+  font-family:var(--mono);
+  font-size:13px;
+  padding:12px;
+  border:1px solid var(--ink);
+  background:var(--paper);
+  border-radius:0;
+  appearance:none;
+}
+.est-result{
+  background:var(--ink);
+  color:var(--paper);
+  padding:34px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.est-result .num{
+  font-family:var(--display);
+  font-stretch:75%;
+  font-weight:800;
+  font-size:clamp(50px,6vw,80px);
+  line-height:1;
+}
+.est-result .verdict{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid #333;
+  line-height:2;
+}
+.est-result .verdict b{color:#999}
+
+/* ===================== EASY / HARD ===================== */
+.eh{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--ink);
+  border:1px solid var(--ink);
+  margin-top:44px;
+}
+@media(max-width:900px){.eh{grid-template-columns:1fr}}
+.eh-col{background:var(--paper);padding:36px}
+.eh-col.miss{background:#0a0a0a;color:#fff}
+.eh-col h3{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:22px;
+}
+.eh-col ul{list-style:none}
+.eh-col li{
+  font-size:14px;line-height:1.7;
+  padding:12px 0 12px 30px;
+  border-top:1px solid var(--line);
+  position:relative;
+}
+.eh-col li::before{content:"✓";position:absolute;left:0;font-family:var(--mono)}
+.eh-col.miss li{border-top-color:#2a2a2a}
+.eh-col.miss li::before{content:"✕";color:#888}
+
+/* ===================== DATA / PRIVACY ===================== */
+.data-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--ink);
+  border:1px solid var(--ink);
+  margin:44px 0;
+}
+@media(max-width:1000px){.data-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.data-grid{grid-template-columns:1fr}}
+.dcell{background:var(--paper);padding:26px}
+.dcell h4{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#000;
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--ink);
+}
+.dcell p{font-size:13.5px;line-height:1.7;color:#333}
+
+.callout{
+  border-left:3px solid var(--ink);
+  background:#f6f6f6;
+  padding:26px 30px;
+  font-size:14.5px;
+  line-height:1.75;
+  margin:24px 0;
+}
+.callout code{
+  font-family:var(--mono);
+  background:var(--ink);
+  color:var(--paper);
+  padding:3px 9px;
+  font-size:13px;
+}
+
+/* ===================== PLACEHOLDER CARDS ===================== */
+.placeholder{
+  border:1px dashed var(--ink);
+  padding:44px;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:30px;
+  align-items:start;
+  margin-top:36px;
+}
+.placeholder .tag{
+  font-family:var(--mono);
+  font-size:40px;
+  font-weight:500;
+  line-height:1;
+}
+.placeholder h3{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.placeholder p{font-size:14.5px;line-height:1.75;color:#333;max-width:700px}
+
+/* ===================== FOOTER ===================== */
+footer{
+  padding:80px var(--pad) 40px;
+  border-top:none;
+}
+.foot-big{
+  font-family:var(--display);
+  font-stretch:72%;
+  font-weight:800;
+  font-size:clamp(60px,12vw,180px);
+  line-height:.85;
+  text-transform:uppercase;
+  color:var(--paper);
+  -webkit-text-stroke:1.5px var(--ink);
+  margin-bottom:50px;
+}
+.foot-row{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:20px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  border-top:1px solid var(--ink);
+  padding-top:22px;
+}
+
+/* ===================== REVEAL ANIMATION ===================== */
+.reveal{
+  opacity:0;
+  transform:translateY(36px);
+  transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);
+}
+.reveal.visible{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{transition:none;opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="scanlines bottom"></div>
+
+<!-- =========== TOP BAR =========== -->
+<header class="topbar">
+  <span>CART 498</span>
+  <nav>
+    <a href="#intro">Intro</a>
+    <a href="#install">Install</a>
+    <a href="#hardware">Hardware</a>
+    <a href="#tiers">Tiers</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#interaction">Interaction</a>
+    <a href="#limits">Limits</a>
+    <a href="#final">Final</a>
+  </nav>
+  <span>November 5, 2026</span>
+</header>
+
+<!-- =========== HERO =========== -->
+<section class="hero" id="top">
+  <div class="hero-meta">Info Site<br>AI Presentation<br>Vol. 01</div>
+  <h1>Ollama</h1>
+  <p class="sub">
+    A framework with an application as its interface — Ollama lets you
+    <strong>download &amp; run open-source AI models locally</strong>, protecting
+    your data because it never leaves your machine. No API key. No expensive
+    hardware. One command.
+  </p>
+  <div class="byline">
+    <span class="label">Presentation By:</span>
+    Kerven, Maia, &amp; Skyla
+  </div>
+  <div class="scroll-hint">Scroll ↓</div>
+</section>
+
+<!-- =========== TICKER =========== -->
+<div class="ticker">
+  <span class="ticker-track" id="ticker"></span>
+</div>
+
+<!-- =========== 01 INTRODUCTION =========== -->
+<section id="intro">
+  <div class="sec-label reveal">Section 01 / Introduction</div>
+  <h2 class="sec-title reveal">What is Ollama?</h2>
+
+  <p class="lead reveal">
+    Before Ollama, open-source models were free to download but <strong>difficult to use</strong>, while
+    proprietary models were easier to access through APIs — at the cost of your data.
+    Ollama bridges that gap: run new open-source models in a <strong>single command</strong>.
+  </p>
+
+  <div class="grid-2">
+    <div class="block reveal">
+      <h3>Access Simplified</h3>
+      <ul>
+        <li>Download &amp; run open-source AIs without an API key.</li>
+        <li>No expensive hardware needed for larger models — use Ollama Cloud.</li>
+        <li>Standardizes how models are installed, run, and managed.</li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <h3>Affordability &amp; Privacy</h3>
+      <ul>
+        <li>Models run privately — data never leaves your computer.</li>
+        <li>Cloud access to larger models keeps data within Ollama's servers.</li>
+        <li>Contrast: governments (e.g. China, USA) can request your data from centralized AI providers.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block reveal" style="margin-top:44px">
+    <h3>Pros</h3>
+    <div class="chips">
+      <span class="chip">Easy to Use</span>
+      <span class="chip">Standardized</span>
+      <span class="chip">Saves Money</span>
+      <span class="chip">Keeps Data Private</span>
+      <span class="chip">Build Apps from Local Machine</span>
+      <span class="chip">Open Source Only</span>
+    </div>
+  </div>
+</section>
+
+<!-- =========== 02 USE CASES =========== -->
+<section id="use-cases">
+  <div class="sec-label reveal">Section 02 / Use Cases</div>
+  <h2 class="sec-title reveal">Open Source Usage</h2>
+  <div class="grid-2">
+    <div class="block reveal">
+      <h3>What You Can Do</h3>
+      <ul>
+        <li>Download &amp; run open-source models entirely locally.</li>
+        <li>Swap models quickly to experiment with different capabilities.</li>
+        <li>Build apps &amp; features powered by models on your own machine.</li>
+        <li>Work offline — local models need no internet connection.</li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <h3>What You Can't Do</h3>
+      <ul>
+        <li>Run or download proprietary / closed-source models through Ollama.</li>
+        <li>No hosted API dependence — you supply the hardware (or Ollama Cloud).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========== 03 INSTALL =========== -->
+<section id="install">
+  <div class="sec-label reveal">Section 03 / Downloading Ollama</div>
+  <h2 class="sec-title reveal">One Command</h2>
+  <p class="lead reveal">Quick and straightforward — open your local terminal and paste the run command:</p>
+
+  <div class="cmd reveal">
+    <div><span class="prompt">PS&gt;</span><code>irm https://ollama.com/install.ps1 | iex</code></div>
+    <button class="copy-btn" id="copyBtn">Copy</button>
+  </div>
+
+  <p class="block reveal" style="font-size:15px;line-height:1.75;color:#333;max-width:700px">
+    Ollama itself requires very little to download — the total install size depends on the
+    demands of whatever models you install onto it.
+  </p>
+</section>
+
+<!-- =========== 04 HARDWARE =========== -->
+<section id="hardware">
+  <div class="sec-label reveal">Section 04 / Money &amp; Hardware Needs</div>
+  <h2 class="sec-title reveal">Hardware</h2>
+
+  <div class="grid-2">
+    <div class="block reveal">
+      <h3>The Rules</h3>
+      <ul>
+        <li><strong>8–16GB RAM</strong> recommended for small or cloud-based models.</li>
+        <li>Runs on CPU from RAM, GPU (if available), or a mix of both — GPU is faster.</li>
+        <li>VRAM isn't required, but it dramatically speeds up responses.</li>
+        <li>Newer Apple Macs automatically split the workload between CPU &amp; GPU.</li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <h3>Three Scenarios</h3>
+      <ul>
+        <li><strong>Model fits in VRAM</strong> → GPU does all the work; best speed.</li>
+        <li><strong>Model partly fits</strong> → some layers on GPU, rest on CPU/RAM; speed drops sharply, often to a fraction of full-GPU speed.</li>
+        <li><strong>No GPU</strong> → everything runs from RAM on the CPU — slow, but fine for small models.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout reveal">
+    <strong>Community shorthand:</strong> a Q4-quantized model takes ~<strong>0.6GB</strong> of RAM or VRAM
+    <strong>per billion parameters</strong> — leave a couple of GB extra for overhead to make sure
+    the model functions. For systems with <strong>4–6GB of VRAM</strong>, <strong>Phi-3</strong> or
+    <strong>Mistral</strong> are recommended; <strong>Qwen-mini</strong> is a good option to run locally too.
+  </div>
+
+  <p class="reveal" style="margin-top:12px">
+    <a class="ext-link" href="https://www.hostinger.com/my/tutorials/?p=134162" target="_blank" rel="noopener">
+      Hardware guide reference ↗ (Hostinger)
+    </a>
+  </p>
+
+  <!-- Interactive VRAM estimator -->
+  <div class="estimator reveal">
+    <div class="est">
+      <h3 class="block" style="font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px">◍ VRAM Estimator</h3>
+      <div class="field">
+        <label>Model size <span id="paramVal">7B parameters</span></label>
+        <input type="range" id="params" min="1" max="70" value="7">
+      </div>
+      <div class="field">
+        <label>Your VRAM (GPU)</label>
+        <select id="vram">
+          <option value="0">No GPU (CPU only)</option>
+          <option value="4">4 GB</option>
+          <option value="6" selected>6 GB</option>
+          <option value="8">8 GB</option>
+          <option value="16">16 GB</option>
+          <option value="24">24 GB</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Your system RAM</label>
+        <select id="ram">
+          <option value="8" selected>8 GB</option>
+          <option value="16">16 GB</option>
+          <option value="32">32 GB</option>
+          <option value="64">64 GB</option>
+        </select>
+      </div>
+    </div>
+    <div class="est-result">
+      <div class="num" id="estNeed">≈ 6.2 GB</div>
+      <div class="verdict" id="estVerdict"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========== 05 TIERS =========== -->
+<section id="tiers">
+  <div class="sec-label reveal">Section 05 / Pricing Tiers</div>
+  <h2 class="sec-title reveal">Free / Pro / Max</h2>
+  <p class="lead reveal">Cloud models are larger models — too big to run on local software — processed on Ollama's GPUs.</p>
+
+  <div class="grid-3">
+    <div class="tier reveal">
+      <div class="t-name">Free</div>
+      <div class="t-price">$0 / forever</div>
+      <ul>
+        <li>No usage credits</li>
+        <li>Server processes up to 3 concurrent requests</li>
+        <li>Unlimited local model use</li>
+        <li>One cloud model at a time</li>
+      </ul>
+    </div>
+    <div class="tier featured reveal">
+      <div class="t-name">Pro</div>
+      <div class="t-price">$20 / month</div>
+      <ul>
+        <li>$60 of usage credits per month</li>
+        <li>Run models on Ollama's GPUs (token amount undisclosed — depends on model demands)</li>
+        <li>3 cloud models at once</li>
+      </ul>
+    </div>
+    <div class="tier reveal">
+      <div class="t-name">Max</div>
+      <div class="t-price">$100 / month</div>
+      <ul>
+        <li>5× Pro usage</li>
+        <li>10 cloud models concurrently</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========== 06 ARCHITECTURE =========== -->
+<section id="architecture">
+  <div class="sec-label reveal">Section 06 / Ollama Architecture</div>
+  <h2 class="sec-title reveal">How It Works</h2>
+
+  <p class="lead reveal">
+    Ollama runs <strong>transformer-based large language models</strong>. The computation happens either
+    on <strong>your laptop</strong> (CPU + RAM, or GPU + VRAM) or on a <strong>cloud GPU server</strong> —
+    never through someone else's third-party API.
+  </p>
+
+  <div class="diagram reveal">
+    <div class="dbox"><b>You</b><span>Type a prompt (text, some models also accept images)</span></div>
+    <div class="arrow">→</div>
+    <div class="dbox dark"><b>Ollama Runtime</b><span>Loads &amp; manages the chosen model</span></div>
+    <div class="arrow">→</div>
+    <div class="dbox">
+      <b>Compute</b>
+      <div class="opt">◉ Local — your CPU / GPU / Apple Silicon split</div>
+      <div class="opt">◉ Cloud — NVIDIA GPUs, servers in USA</div>
+      <span style="margin-top:10px;border-top:1px solid;padding-top:8px"><b>→ Response</b> generated by the model</span>
+    </div>
+  </div>
+  <div class="diagram-caption reveal">Fig. 01 — Prompt pipeline: user input → runtime → local or cloud compute → response</div>
+
+  <div class="block reveal" style="margin-top:50px">
+    <h3>Tech Stack Notes</h3>
+    <ul>
+      <li>Model choice determines capabilities — the framework standardizes how they run.</li>
+      <li><strong>Qwen-mini</strong> is a good option to run locally.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =========== 07 INTERACTION =========== -->
+<section id="interaction">
+  <div class="sec-label reveal">Section 07 / Interaction Paradigm</div>
+  <h2 class="sec-title reveal">Prompt → Response</h2>
+
+  <p class="lead reveal">
+    The basic unit of interaction is a <strong>text prompt</strong>. You provide a question, instructions,
+    or content — the model generates a response. Ollama runs the model you choose.
+  </p>
+
+  <div class="grid-2">
+    <div class="block reveal">
+      <h3>What Do You Control?</h3>
+      <ul>
+        <li>The model, its instructions, and the context it receives.</li>
+        <li>Settings that influence responses.</li>
+        <li>Basic tasks: summarize a document, translate text, write code, brainstorm, adopt a tone.</li>
+        <li>Some models accept images — ask questions about visual content.</li>
+        <li>Where it runs: <strong>locally</strong> (your hardware, specs matter) or <strong>cloud</strong> (remote server).</li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <h3>Where Is Human Agency?</h3>
+      <ul>
+        <li>You <strong>define the task</strong> — ask what you need done.</li>
+        <li>You <strong>provide background</strong> — relevant information for better execution.</li>
+        <li>The model generates the response, but <strong>you decide what's useful</strong> and how to use it.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="eh reveal">
+    <div class="eh-col hit">
+      <h3>What It Makes Easy</h3>
+      <ul>
+        <li>Natural-language requests: summarize, translate, brainstorm, explain, generate code.</li>
+        <li>Quick change of the model being used — experiment locally.</li>
+        <li>Connect generated text to a project.</li>
+        <li>More privacy &amp; control over your own data.</li>
+        <li>No Wi-Fi needed to run local models.</li>
+        <li>Cloud access for models too demanding for your computer.</li>
+      </ul>
+    </div>
+    <div class="eh-col miss">
+      <h3>What It Makes Hard</h3>
+      <ul>
+        <li>Models can misunderstand instructions, invent information, or give inconsistent answers.</li>
+        <li>Context window limits how much it can consider at once — fluent ≠ accurate.</li>
+        <li>Cloud use doesn't make answers accurate or give current information.</li>
+        <li>Local: memory, processing power &amp; storage limit which models you can run and how fast.</li>
+        <li>Cloud: dependent on internet, service availability &amp; usage limits — and less privacy.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========== 08 LIMITS & PRIVACY =========== -->
+<section id="limits">
+  <div class="sec-label reveal">Section 08 / Limits, Risks &amp; Data</div>
+  <h2 class="sec-title reveal">Where Does Your Data Go?</h2>
+
+  <p class="lead reveal">
+    Prompts are retained <strong>transiently</strong> — only while relevant, then deleted shortly after
+    (~5 minute retention). Prompts are <strong>never used for training</strong>.
+  </p>
+
+  <div class="data-grid reveal">
+    <div class="dcell"><h4>Account Info</h4><p>Login, name, date joined, etc. — retained.</p></div>
+    <div class="dcell"><h4>Billing Records</h4><p>Kept as required by tax &amp; accounting law.</p></div>
+    <div class="dcell"><h4>Support Comms</h4><p>Crash reports and support correspondence.</p></div>
+    <div class="dcell"><h4>Metadata &amp; Analytics</h4><p>How the service is used (e.g. model downloaded) — recorded temporarily, then deleted or de-identified.</p></div>
+  </div>
+
+  <div class="callout reveal">
+    <strong>Storage:</strong> data is stored on servers in the <strong>USA</strong> on NVIDIA GPUs.
+    You can force Ollama to clear the model from VRAM before the retention window by typing
+    <code>--keep-alive 0</code> in the terminal.
+  </div>
+</section>
+
+<!-- =========== 09 EXAMPLE =========== -->
+<section id="example">
+  <div class="sec-label reveal">Section 09 / Our Example</div>
+  <h2 class="sec-title reveal">Make Something</h2>
+  <p class="lead reveal">An original creative piece made with Ollama — the core of our demo. (Not a reproduced tutorial.)</p>
+
+  <!-- EDIT ME: swap this placeholder for your demo -->
+  <div class="placeholder reveal">
+    <div class="tag">▩</div>
+    <div>
+      <h3>Demo Placeholder</h3>
+      <p>Insert your original piece here — screenshots, terminal output, generated text,
+      or a video embed. Ideas with Ollama: a locally-run poetry generator, an offline
+      creative-writing assistant, a code explainer built from a downloaded model,
+      or an image-question-answering demo with a vision-enabled model.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =========== 10 FINAL PROJECT =========== -->
+<section id="final">
+  <div class="sec-label reveal">Section 10 / Connection to Final Project</div>
+  <h2 class="sec-title reveal">Where It Fits</h2>
+
+  <div class="grid-3" style="margin-top:10px">
+    <div class="tier reveal">
+      <div class="t-name">Use</div>
+      <div class="t-price">How we could use it</div>
+      <ul>
+        <li>Run a local model as the brain of an interactive artwork — fully offline, fully private.</li>
+        <li>Generate live text for an installation without API costs per visitor.</li>
+      </ul>
+    </div>
+    <div class="tier featured reveal">
+      <div class="t-name">Extend</div>
+      <div class="t-price">What we'd need to extend</div>
+      <ul>
+        <li>A custom interface beyond the terminal (web UI, physical input).</li>
+        <li>Tuned instructions/system prompt &amp; model choice for the project's tone.</li>
+      </ul>
+    </div>
+    <div class="tier reveal">
+      <div class="t-name">Risk</div>
+      <div class="t-price">What could go wrong</div>
+      <ul>
+        <li>Hallucinated or incoherent output in front of an audience.</li>
+        <li>Hardware bottleneck — slow responses on the exhibition machine.</li>
+        <li>Context-window limits forgetting earlier interaction.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========== FOOTER =========== -->
+<footer>
+  <div class="foot-big">Ollama</div>
+  <div class="foot-row">
+    <span>CART 498 — AI Presentation</span>
+    <span>Kerven, Maia, &amp; Skyla</span>
+    <span>November 5, 2026</span>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script>
+/* ===================== TICKER ===================== */
+const phrases = [
+  "PRIVATE","LOCAL","OPEN SOURCE","ONE COMMAND","NO API KEY",
+  "OFFLINE","STANDARDIZED","YOUR HARDWARE","YOUR DATA"
+];
+const half = phrases.map(p => `${p} \u00A0•\u00A0 `).join("");
+document.getElementById('ticker').textContent = half + half; // doubled for seamless loop
+
+/* ===================== COPY INSTALL COMMAND ===================== */
+const copyBtn = document.getElementById('copyBtn');
+copyBtn.addEventListener('click', async () => {
+  const cmd = "irm https://ollama.com/install.ps1 | iex";
+  try {
+    await navigator.clipboard.writeText(cmd);
+  } catch { /* fallback for file:// */
+    const t = document.createElement('textarea');
+    t.value = cmd; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); t.remove();
+  }
+  copyBtn.textContent = "Copied ✓";
+  setTimeout(() => copyBtn.textContent = "Copy", 1600);
+});
+
+/* ===================== SCROLL REVEAL ===================== */
+const io = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      e.target.style.transitionDelay = `${(i % 3) * 0.08}s`;
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ===================== VRAM ESTIMATOR =====================
+   Community rule: Q4 model ≈ 0.6GB per billion params + ~2GB overhead */
+const paramsEl = document.getElementById('params');
+const vramEl   = document.getElementById('vram');
+const ramEl    = document.getElementById('ram');
+const paramVal = document.getElementById('paramVal');
+const estNeed  = document.getElementById('estNeed');
+const estVerdict = document.getElementById('estVerdict');
+
+const OVERHEAD = 2, PER_BILLION = 0.6;
+
+function estimate(){
+  const b    = +paramsEl.value;
+  const vram = +vramEl.value;
+  const ram  = +ramEl.value;
+  const need = b * PER_BILLION + OVERHEAD;
+
+  paramVal.textContent = `${b}B parameters`;
+  estNeed.textContent  = `≈ ${need.toFixed(1)} GB`;
+
+  let mode, note;
+  if (vram >= need) {
+    mode = "FULL GPU"; note = "Model fits in VRAM — GPU does all the work. Best speed.";
+  } else if (vram > 0 && vram + ram >= need) {
+    mode = "SPLIT CPU+GPU"; note = "Partly fits — layers split between GPU & CPU. Speed drops sharply.";
+  } else if (ram >= need) {
+    mode = "CPU ONLY"; note = vram === 0
+      ? "No GPU — everything runs from RAM on the CPU. Slow, but fine for small models."
+      : "VRAM too small — effectively CPU-bound. Consider a smaller model.";
+  } else {
+    mode = "WON'T RUN"; note = "Not enough memory. Try a smaller model, or use Ollama Cloud.";
+  }
+
+  estVerdict.innerHTML = `<b>${mode}</b><br>${note}`;
+}
+[paramsEl, vramEl, ramEl].forEach(el => el.addEventListener('input', estimate));
+estimate();
+</script>
+</body>
+</html>
