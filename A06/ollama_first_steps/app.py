@@ -1,17 +1,11 @@
 import ollama
-
-response = ollama.systemone(
-    model='d3',
-    state='Hello World',
-    questions={
-        'says_hello': {
-            'type': 'noul',
-            'instructions': 'Does the state text contain a greeting?',
-            'criteria': {
-                'true': 'The state text contains a greeting.',
-                'false': 'The state text does not contain a greeting.',
-            },
-        },
-    },
+ 
+MODEL = "llama3.2:1b"
+ 
+response = ollama.chat(
+    model=MODEL,
+    messages=[{"role": "user", "content": "Hello!"}],
 )
-print(response.answers['says_hello'].noul)
+ 
+print(response.message.content)
+ 
