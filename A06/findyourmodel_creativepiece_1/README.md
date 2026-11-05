@@ -19,6 +19,14 @@ This information is then used by a TinyLlama 1.1B-powered chat interface. You ca
 
 Once you've found a suitable model, simply copy the generated terminal command into your project to get started!
 
+## Debugging 
+If tinyllama won't download, make sure you have enough disk space: 
+1. Inspect page then run: 
+navigator.storage.estimate().then(e => console.log('free ≈', Math.round((e.quota - e.usage) / 1e6), 'MB'))
+If it returns less than 1800mb, then clear disk space
+2. Go to chrome settings and enable "Allow sites to save data on your device"
+
+
 ## Credits
 
 Built using:
