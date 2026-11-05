@@ -70,7 +70,7 @@ nav{
 .pillbtn{background:var(--ink);color:#fff}
 
 /* ===================== LAYOUT ===================== */
-.wrap{position:relative;z-index:2;max-width:840px;margin:0 auto;padding:20px clamp(18px,4vw,32px) 60px}
+.wrap{position:relative;z-index:2;max-width:840px;margin:0 auto;padding:20px clamp(18px,4vw,32px) 80px}
 
 .hero{text-align:center;margin:48px 0 56px}
 .badge{
@@ -165,79 +165,6 @@ nav{
 }
 @keyframes bob{50%{transform:translateY(6px)}}
 
-/* ================================================================
-   CHAT AS SPEECH BUBBLE  +  OLLIE THE LLAMA
-================================================================ */
-.chat-wrap{position:relative;margin-bottom:110px}   /* room for the llama */
-
-.chat-bubble{
-  position:relative;
-  background:var(--card);
-  border-radius:28px;
-  padding:clamp(26px,4vw,44px);
-  box-shadow:var(--shadow);
-}
-/* bubble tail pointing down-right at the llama */
-.chat-bubble::after{
-  content:"";position:absolute;bottom:-20px;right:66px;
-  width:0;height:0;
-  border-left:15px solid transparent;
-  border-right:15px solid transparent;
-  border-top:24px solid #fff;
-  filter:drop-shadow(0 10px 14px rgba(80,70,180,.12));
-}
-
-/* --- Ollie the llama (pure CSS Ollama-style logo) --- */
-.llama{
-  position:absolute;right:22px;bottom:-92px;
-  width:110px;height:130px;
-  animation:llamaBob 3.2s ease-in-out infinite;
-  cursor:default;
-}
-@keyframes llamaBob{50%{transform:translateY(-7px)}}
-
-.llama .ear{
-  position:absolute;top:0;width:24px;height:60px;
-  background:var(--ink);border-radius:14px;
-  transition:transform .25s ease;
-}
-.llama .ear.l{left:16px;transform:rotate(-17deg);transform-origin:bottom center}
-.llama .ear.r{right:16px;transform:rotate(17deg);transform-origin:bottom center}
-.llama:hover .ear.l{transform:rotate(-28deg)}
-.llama:hover .ear.r{transform:rotate(28deg)}
-
-.llama .head{
-  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
-  width:86px;height:94px;background:var(--ink);
-  border-radius:42px;
-}
-.llama .eye{
-  position:absolute;top:32px;width:13px;height:21px;
-  background:#fff;border-radius:8px;
-  animation:blink 5s infinite;
-}
-.llama .eye.l{left:19px}
-.llama .eye.r{right:19px}
-@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
-
-.llama::after{ /* soft ground shadow */
-  content:"";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
-  width:80px;height:14px;border-radius:50%;
-  background:rgba(80,70,180,.18);filter:blur(3px);
-}
-
-/* excited wiggle while Ollie is "typing" */
-.llama.talking .head{animation:talk .45s ease-in-out infinite}
-@keyframes talk{50%{transform:translateX(-50%) translateY(-5px)}}
-
-/* little name tag */
-.llama-tag{
-  position:absolute;right:118px;bottom:-30px;
-  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
-  background:#fff;color:var(--violet);padding:7px 14px;border-radius:100px;
-  box-shadow:var(--shadow);white-space:nowrap;
-}
-
 /* ===================== CHAT ===================== */
 .chat-log{
   background:#faf9ff;border-radius:18px;padding:22px;
@@ -319,11 +246,6 @@ nav{
 }
 .chat-input button:hover{background:#5a4ad4}
 
-@media(max-width:560px){
-  .llama{transform:scale(.82);right:6px;bottom:-84px;transform-origin:bottom right}
-  .llama-tag{display:none}
-}
-
 footer{
   position:relative;z-index:2;text-align:center;padding:30px 20px 44px;
   font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--grey);
@@ -348,7 +270,7 @@ footer{
     <div class="badge">CART 498 · <b>Companion Tool</b></div>
     <h1>Will it run?<br><em>Find your model.</em></h1>
     <p>Pick a computer below — or build your own — then describe your project.
-       Ollie the llama matches you with an open-source model that actually fits your hardware.</p>
+       The recommender matches you with an open-source model that actually fits your hardware.</p>
   </div>
 
   <!-- ================= STEP 1: YOUR COMPUTER ================= -->
@@ -404,39 +326,26 @@ footer{
 
   <div class="arrow-down">↓</div>
 
-  <!-- ================= STEP 2: OLLIE'S SPEECH BUBBLE ================= -->
-  <div class="chat-wrap">
-    <section class="chat-bubble">
-      <div class="step two">● STEP 2</div>
-      <h2>Ask Ollie 🦙</h2>
-      <p class="sub">Describe your project — Ollie knows your specs from Step 1 and only suggests models that fit.</p>
+  <!-- ================= STEP 2: CHATBOT ================= -->
+  <section class="card">
+    <div class="step two">● STEP 2</div>
+    <h2>Describe your project</h2>
+    <p class="sub">TinyLlama knows your specs from Step 1 — it only suggests models that fit.</p>
 
-      <div class="chat-log" id="log"></div>
+    <div class="chat-log" id="log"></div>
 
-      <div class="quick">
-        <button class="qchip c1" data-q="I'm building a code assistant for my dev setup, running fully local.">💻 Code assistant</button>
-        <button class="qchip c2" data-q="Offline poetry generator for a gallery — privacy matters, no internet allowed.">✍️ Offline poetry</button>
-        <button class="qchip c3" data-q="An art installation where the model describes webcam photos of visitors, needs to respond fast.">📷 Vision installation</button>
-        <button class="qchip c4" data-q="What's the biggest model I can run?">🐘 Biggest I can run?</button>
-      </div>
-
-      <div class="chat-input">
-        <textarea id="in" rows="1" placeholder="e.g. a chatbot that gallery visitors can talk to…"></textarea>
-        <button id="send">Send</button>
-      </div>
-    </section>
-
-    <!-- OLLIE THE LLAMA -->
-    <div class="llama-tag">THAT'S OLLIE →</div>
-    <div class="llama" id="llama" title="Ollie the Ollama llama 🦙">
-      <div class="ear l"></div>
-      <div class="ear r"></div>
-      <div class="head">
-        <div class="eye l"></div>
-        <div class="eye r"></div>
-      </div>
+    <div class="quick">
+      <button class="qchip c1" data-q="I'm building a code assistant for my dev setup, running fully local.">💻 Code assistant</button>
+      <button class="qchip c2" data-q="Offline poetry generator for a gallery — privacy matters, no internet allowed.">✍️ Offline poetry</button>
+      <button class="qchip c3" data-q="An art installation where the model describes webcam photos of visitors, needs to respond fast.">📷 Vision installation</button>
+      <button class="qchip c4" data-q="What's the biggest model I can run?">🐘 Biggest I can run?</button>
     </div>
-  </div>
+
+    <div class="chat-input">
+      <textarea id="in" rows="1" placeholder="e.g. a chatbot that gallery visitors can talk to…"></textarea>
+      <button id="send">Send</button>
+    </div>
+  </section>
 </div>
 
 <footer>
@@ -446,15 +355,26 @@ footer{
 <script>
 /* ================================================================
    STEP 1 — HARDWARE STATE & PRESETS
+   (sorted weakest → strongest; mac:true = Apple unified memory,
+    shared:'...' = other unified-memory device with custom note)
 ================================================================ */
 const PRESETS=[
- {id:'budget', name:'Budget Laptop',  dot:'#3aa8ff', vram:0,  ram:8,  spec:'No GPU · 8 GB RAM'},
- {id:'mid',    name:'Everyday Laptop',dot:'#ff8a3d', vram:4,  ram:16, spec:'4 GB VRAM · 16 GB RAM'},
- {id:'air',    name:'MacBook Air',    dot:'#f471b5', vram:10, ram:16, spec:'M-series · 16 GB unified', mac:true},
- {id:'pro',    name:'MacBook Pro',    dot:'#b79aff', vram:27, ram:36, spec:'M-series Pro · 36 GB unified', mac:true},
- {id:'gaming', name:'Gaming PC',      dot:'#6c5ce7', vram:12, ram:32, spec:'12 GB VRAM · 32 GB RAM'},
- {id:'rig',    name:'Creator Rig',    dot:'#16a34a', vram:24, ram:64, spec:'24 GB VRAM · 64 GB RAM'},
- {id:'custom', name:'+ Build your own',dot:'#8a86a3', custom:true},
+ {id:'chrome', name:'Chromebook',       dot:'#94a3b8', vram:0,  ram:4,   spec:'No GPU · 4 GB RAM'},
+ {id:'budget', name:'Budget Laptop',    dot:'#3aa8ff', vram:0,  ram:8,   spec:'No GPU · 8 GB RAM'},
+ {id:'pi',     name:'Raspberry Pi 5',   dot:'#dc2626', vram:0,  ram:8,   spec:'ARM board · 8 GB shared'},
+ {id:'mid',    name:'Everyday Laptop',  dot:'#ff8a3d', vram:4,  ram:16,  spec:'4 GB VRAM · 16 GB RAM'},
+ {id:'air8',   name:'MacBook Air 8 GB', dot:'#f9a8d4', vram:5,  ram:8,   spec:'M-series · 8 GB unified', mac:true},
+ {id:'glap',   name:'Gaming Laptop',    dot:'#f59e0b', vram:6,  ram:16,  spec:'6 GB VRAM · 16 GB RAM'},
+ {id:'deck',   name:'Steam Deck',       dot:'#14b8a6', vram:8,  ram:16,  spec:'APU · 16 GB shared',
+   shared:'🕹 The Steam Deck shares its 16 GB between CPU and GPU — the VRAM figure is the estimated GPU-usable portion.'},
+ {id:'air',    name:'MacBook Air 16 GB',dot:'#f471b5', vram:10, ram:16,  spec:'M-series · 16 GB unified', mac:true},
+ {id:'pro',    name:'MacBook Pro',      dot:'#b79aff', vram:27, ram:36,  spec:'M-series Pro · 36 GB unified', mac:true},
+ {id:'gaming', name:'Gaming PC',        dot:'#6c5ce7', vram:12, ram:32,  spec:'12 GB VRAM · 32 GB RAM'},
+ {id:'4k',     name:'4K Gaming PC',     dot:'#059669', vram:16, ram:32,  spec:'16 GB VRAM · 32 GB RAM'},
+ {id:'rig',    name:'Creator Rig',      dot:'#16a34a', vram:24, ram:64,  spec:'24 GB VRAM · 64 GB RAM'},
+ {id:'studio', name:'Mac Studio',       dot:'#8b5cf6', vram:48, ram:64,  spec:'M-series Max/Ultra · 64 GB unified', mac:true},
+ {id:'ws',     name:'AI Workstation',   dot:'#475569', vram:48, ram:128, spec:'48 GB VRAM · 128 GB RAM'},
+ {id:'custom', name:'+ Build your own', dot:'#8a86a3', custom:true},
 ];
 
 const state={vram:12, ram:32, preset:'gaming'};
@@ -471,6 +391,9 @@ const presetsEl=document.getElementById('presets'),
       vCustom=document.getElementById('vCustom'),
       rCustom=document.getElementById('rCustom');
 
+const APPLE_NOTE='🍎 Apple Silicon shares memory between CPU and GPU automatically — the VRAM figure is an estimate of the GPU-usable portion.';
+
+/* build preset buttons */
 PRESETS.forEach(p=>{
   const b=document.createElement('button');
   b.className='preset'+(p.custom?' custom':'')+(p.id===state.preset?' active':'');
@@ -506,7 +429,11 @@ function updateStats(preset){
   statVram.textContent=state.vram;
   statRam.textContent=state.ram;
   vramHint.textContent= state.vram===0 ? 'No dedicated GPU — CPU only' : 'Dedicated graphics card memory';
-  macNote.classList.toggle('show',!!(preset&&preset.mac));
+
+  /* unified-memory note: Apple text for Macs, custom text for other shared-memory devices */
+  const note = preset ? (preset.shared || (preset.mac ? APPLE_NOTE : null)) : null;
+  macNote.classList.toggle('show',!!note);
+  if(note) macNote.textContent=note;
 
   const cap=capacity(), maxB=Math.max(0,Math.floor((cap-OVERHEAD)/PER_B));
   fitPill.textContent=`models up to ~${maxB}B params`;
@@ -516,10 +443,8 @@ function updateStats(preset){
 }
 
 /* ================================================================
-   STEP 2 — OLLIE THE LLAMA CHATBOT (local, rule-based)
+   STEP 2 — MODEL MATCH CHATBOT (local, rule-based)
 ================================================================ */
-const llama=document.getElementById('llama');
-
 const MODELS=[
  {name:'tinyllama',       b:1.1, tags:['fast','chat'],              blurb:'Featherweight — runs on nearly anything.'},
  {name:'qwen2.5:1.5b',    b:1.5, tags:['fast','chat','translate'],  blurb:'Qwen-mini class — great small starter, good multilingual.'},
@@ -554,20 +479,12 @@ function addUser(t){const d=document.createElement('div');d.className='msg user'
 function addBot(h){const d=document.createElement('div');d.className='msg bot';d.innerHTML=`<div class="bubble">${h}</div>`;log.appendChild(d);scrollLog();}
 function sysnote(t){
   const last=log.lastElementChild;
-  if(last&&last.classList.contains('sysnote')&&last.dataset.t===t)return;
+  if(last&&last.classList.contains('sysnote')&&last.dataset.t===t)return; // no duplicates
   const d=document.createElement('div');d.className='sysnote';d.dataset.t=t;d.textContent=t;
   log.appendChild(d);scrollLog();
 }
-/* llama gets excited while "typing" 🦙 */
-function typingOn(){
-  const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML='<i></i><i></i><i></i>';log.appendChild(d);scrollLog();
-  llama.classList.add('talking');
-}
-function typingOff(){
-  const t=document.getElementById('typing');if(t)t.remove();
-  llama.classList.remove('talking');
-}
+function typingOn(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML='<i></i><i></i><i></i>';log.appendChild(d);scrollLog();}
+function typingOff(){const t=document.getElementById('typing');if(t)t.remove();}
 
 function fitBadge(need){
   const {vram}=state, cap=capacity();
@@ -614,6 +531,7 @@ function recommend(raw){
 
   const cap=capacity();
 
+  /* ceiling question */
   if(/biggest|largest|max(imum)?\s+model|how big/.test(text)){
     const fit=[...MODELS].filter(m=>needFor(m.b)<=cap).sort((a,b)=>b.b-a.b)[0];
     if(!fit)return 'Even the smallest model I know needs ~2.7 GB — check your specs, or look at <b>Ollama Cloud</b>.'+specNote;
@@ -621,6 +539,7 @@ function recommend(raw){
       [...MODELS].reverse().find(m=>m!==fit&&needFor(m.b)<=cap))+specNote;
   }
 
+  /* intent scoring */
   const hits=new Set();
   LEX.forEach(c=>{if(c.words.some(w=>text.includes(w)))hits.add(c.tag);});
   if(!hits.size)hits.add('chat');
@@ -652,7 +571,7 @@ function respond(raw){
   setTimeout(()=>{
     typingOff();
     if(/^(hi|hello|hey|yo)\b/i.test(t)&&t.length<20){
-      addBot(`Hey! 🦙 Tell me what you're making — a chatbot, a code helper, a vision demo, an offline installation…<br>
+      addBot(`Hi! 👋 I'm <b>TinyLlama</b> (<b>tinyllama:1.1b</b>). Tell me what you're making — a chatbot, a code helper, a vision demo, an offline installation…<br>
               I'll match it to a model that fits your <b>${state.vram||'no'} GB VRAM / ${state.ram} GB RAM</b> setup.`);
       return;
     }
@@ -685,8 +604,9 @@ document.getElementById('fsBtn').onclick=()=>{
   else document.documentElement.requestFullscreen();
 };
 
-/* greeting */
-addBot(`Hey! 🦙 I'm <b>Ollie</b>. Set your computer in Step 1 above, then describe your project —
+/* greeting — the chatbot introduces itself as TinyLlama */
+addBot(`Hi! 👋 I'm <b>TinyLlama</b> 🦙 — the <b>tinyllama:1.1b</b> chatbot, small enough to run on almost anything.<br>
+        Set your computer in Step 1 above, then describe your project —
         I'll recommend an open-source model and give you the exact <b>ollama run</b> command.`);
 updateStats(PRESETS.find(p=>p.id===state.preset));
 </script>
