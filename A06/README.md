@@ -149,6 +149,6 @@ Nothing leaves your computer after the model is downloaded (Ollama n.d.b).
 
 ## References
 
-Ollama. n.d.a. "Download Ollama." Accessed November 5, 2026. https://ollama.com/download.
+Ollama. n.d.a. "Download Ollama." Accessed November 2, 2026. https://ollama.com/download.
 
-Ollama. n.d.b. "Quickstart." Accessed October 29, 2026. https://docs.ollama.com/quickstart.
+Ollama. n.d.b. "Quickstart." Accessed November 2, 2026. https://docs.ollama.com/quickstart.

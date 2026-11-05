@@ -1,5 +1,5 @@
-# Ollama basics
-
+# Ollama basics (for developers)
+ 
 A minimal Python example that sends `Hello!` to a local Ollama model and prints the reply. Everything runs on your own computer, with no account, API key, or paid plan.
 
 ## Requirements
