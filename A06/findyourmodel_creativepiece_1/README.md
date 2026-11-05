@@ -8,7 +8,7 @@ Built for creators and developers working with open-source AI through [Ollama](h
 
 Finding an AI model that suits your project and is compatible with your computer's hardware can be challenging. The **Ollama Library Tool** simplifies this process by recommending models based on your computer's capabilities and your project's requirements.
 
-- **Ollama Library:** https://ollama.com/library — Browse Ollama's collection of available models.
+- **Ollama Library:** https://ollama.com/library — Browse Ollama's collection of available models, Note: can be confusing to navigate.
 - **Ollama Library Tool:** https://browneyegirl.github.io/CART498-GenAI/A06/findyourmodel_creativepiece_1/ — Find models suited to your hardware and project.
 
 ## Running It
